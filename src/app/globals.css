@@ -1,0 +1,110 @@
+@import url("https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=general-sans@400,500,600&display=swap");
+@import "tailwindcss";
+
+:root {
+  /* Superficies */
+  --bg: #ece1cc;          /* Beige tostado — fondo principal */
+  --bg-2: #f5eedf;        /* Crema claro — secciones alternadas */
+  --bg-3: #e4d6bb;        /* Beige más profundo — tarjetas */
+  --dark: #240d08;        /* Marrón casi negro — secciones oscuras */
+  /* Texto */
+  --cream: #240d08;       /* Texto principal (sobre claro) */
+  --cream-dim: #5a3a28;   /* Texto secundario */
+  --muted: #8a6f52;       /* Texto terciario / labels */
+  --paper: #f5eedf;       /* Texto sobre secciones oscuras */
+  /* Acentos de marca */
+  --gold: #6d2900;        /* Marrón Cacao */
+  --gold-bright: #f5cf89; /* Beige Natural (maní) */
+  --btn: #80613b;         /* Marrón botón (pill) */
+  --line: rgba(36, 13, 8, 0.14);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-dark: var(--dark);
+  --color-cream: var(--cream);
+  --color-cream-dim: var(--cream-dim);
+  --color-muted: var(--muted);
+  --color-paper: var(--paper);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-btn: var(--btn);
+  --color-line: var(--line);
+  --font-display: "Clash Display", ui-sans-serif, sans-serif;
+  --font-sans: "General Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--paper);
+}
+
+.font-display {
+  font-family: "Clash Display", ui-sans-serif, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(120deg, #a4551d, var(--gold) 55%, #753b18);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+/* Aurora: manchas de color que derivan lento detrás de las secciones */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(6%, -8%) scale(1.15); }
+  66% { transform: translate(-7%, 5%) scale(0.92); }
+}
+.animate-aurora { animation: aurora-drift 24s ease-in-out infinite; }
+.animate-aurora-2 { animation: aurora-drift 30s ease-in-out infinite reverse; }
+
+/* Botón premium: brillo que barre + lift */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine > .shine {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%) skewX(-20deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.btn-shine:hover > .shine {
+  transform: translateX(120%) skewX(-20deg);
+}
+
+html { scroll-behavior: smooth; }
