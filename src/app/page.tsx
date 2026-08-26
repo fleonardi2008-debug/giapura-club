@@ -5,16 +5,16 @@ const PUBLIC_ERP_URL = process.env.NEXT_PUBLIC_ERP_URL ?? ERP_URL;
 
 const FALLBACK: ClubContent = {
   config: {
-    heroTitulo: "Bienvenido al Club Fundadores",
+    heroTitulo: "Estás adentro.",
     heroSubtitulo:
-      "Un lugar reservado para quienes estuvieron desde el principio.",
+      "Muy poca gente va a ver esta página. Solo los que estuvieron desde el primer frasco. Vos sos uno de ellos.",
     heroVideoUrl: null,
-    introTitulo: "Qué es este acceso",
+    introTitulo: "Qué significa tener esta llave",
     introTexto:
-      "Este número te acompaña. Cada tanto voy a abrir oportunidades reservadas únicamente para los Fundadores. A veces será un acceso anticipado. Otras, una encuesta. O un beneficio. Nunca va a ser exactamente lo mismo.",
+      "Te lo digo simple: este acceso es tuyo y no vence.\n\nCada tanto voy a abrir algo que queda solo entre nosotros, los Fundadores. Un adelanto antes que nadie. Un beneficio que no está en ningún otro lado. A veces, tu opinión para decidir qué viene.\n\nNunca va a ser lo mismo. Y nunca va a estar abierto al público.",
     novedadesTexto:
-      "No quiero que tengas que acordarte de entrar. Dejame tu mail y te aviso únicamente cuando haya algo nuevo para Fundadores.",
-    footerTexto: "Gracias por haber estado desde el principio. — Fran",
+      "No quiero que tengas que estar pendiente. Dejame tu mail y te aviso yo, en persona, solo cuando abra algo nuevo para Fundadores. Nada de spam. Nada de relleno.",
+    footerTexto: "Gracias por haber estado desde el principio. Esto también es tuyo. — Fran",
   },
   bloques: [],
   historial: [],
