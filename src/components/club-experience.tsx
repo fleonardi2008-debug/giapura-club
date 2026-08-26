@@ -39,6 +39,20 @@ const TIPO_LABEL: Record<string, string> = {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+/* Renderiza texto con soporte de **negrita** y saltos de línea (el contenedor usa
+   whitespace-pre-line). Permite resaltar frases desde el editor del ERP. */
+function renderRich(text: string): ReactNode {
+  return text.split(/\*\*/).map((chunk, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} className="font-medium text-cream">
+        {chunk}
+      </strong>
+    ) : (
+      <span key={i}>{chunk}</span>
+    )
+  );
+}
+
 /* ---------- Íconos (SVG, sin emojis) ---------- */
 
 function IconCheck({ className = "" }: { className?: string }) {
@@ -289,7 +303,7 @@ function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null
           <IconCheck className="h-3.5 w-3.5" />
         </span>
         <p className="text-lg text-cream">
-          Listo. Te aviso yo cuando abra algo nuevo. Nadie más lo va a saber antes que vos.
+          Listo. Te voy a avisar directamente cada vez que haya algo nuevo para Fundadores.
         </p>
       </div>
     );
@@ -297,7 +311,11 @@ function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null
 
   return (
     <div className="space-y-5">
-      {texto && <p className="max-w-[52ch] text-[1.05rem] leading-relaxed text-cream-dim">{texto}</p>}
+      {texto && (
+        <p className="max-w-[52ch] whitespace-pre-line text-[1.05rem] leading-[1.7] text-cream-dim">
+          {renderRich(texto)}
+        </p>
+      )}
       <form onSubmit={submit} className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
         <label htmlFor="club-email" className="sr-only">
           Tu correo electrónico
@@ -318,7 +336,7 @@ function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null
           className="btn-shine h-13 cursor-pointer rounded-full bg-btn px-8 py-3.5 text-sm font-medium text-paper outline-none transition-transform duration-300 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:cursor-wait disabled:opacity-60"
         >
           <span className="shine" />
-          {estado === "loading" ? "Enviando…" : "Avisame primero"}
+          {estado === "loading" ? "Enviando…" : "Avisame cuando haya algo nuevo"}
         </button>
       </form>
       {estado === "error" && (
@@ -377,7 +395,7 @@ export function ClubExperience({
           </div>
         </RevealOnLoad>
         <RevealOnLoad delay={0.12}>
-          <h1 className="font-display mx-auto mt-6 max-w-[14ch] text-[2.6rem] leading-[1.02] text-cream sm:text-6xl">
+          <h1 className="font-display mx-auto mt-6 max-w-[16ch] text-[2.5rem] leading-[1.04] text-balance text-cream sm:text-[3.4rem]">
             {config.heroTitulo}
           </h1>
         </RevealOnLoad>
@@ -398,17 +416,14 @@ export function ClubExperience({
       {/* Qué significa este acceso */}
       <section className="mx-auto max-w-2xl px-6 py-28 text-center sm:py-36">
         <Reveal>
-          <SectionLabel>Lo que es</SectionLabel>
-        </Reveal>
-        <Reveal delay={0.08}>
-          <h2 className="font-display mt-7 text-[2rem] leading-tight text-cream sm:text-[2.6rem]">
+          <h2 className="font-display text-[2rem] leading-tight text-balance text-cream sm:text-[2.6rem]">
             {config.introTitulo}
           </h2>
         </Reveal>
         {config.introTexto && (
-          <Reveal delay={0.16}>
-            <p className="mx-auto mt-7 max-w-[50ch] whitespace-pre-line text-lg leading-[1.75] text-cream-dim">
-              {config.introTexto}
+          <Reveal delay={0.1}>
+            <p className="mx-auto mt-8 max-w-[50ch] whitespace-pre-line text-lg leading-[1.8] text-cream-dim">
+              {renderRich(config.introTexto)}
             </p>
           </Reveal>
         )}
@@ -475,13 +490,10 @@ export function ClubExperience({
       <section className="mx-auto max-w-2xl px-6 pb-28 sm:pb-36">
         <Reveal>
           <div className="rounded-[2rem] border border-line bg-bg-2/60 p-8 sm:p-12">
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-gold">
-              Enterate primero
-            </p>
-            <h2 className="font-display mt-4 text-[1.7rem] leading-tight text-cream sm:text-3xl">
-              Que no se te escape nada
+            <h2 className="font-display text-[1.7rem] leading-tight text-balance text-cream sm:text-3xl">
+              No te pierdas lo que viene.
             </h2>
-            <div className="mt-6">
+            <div className="mt-7">
               <NovedadesForm erpUrl={erpUrl} texto={config.novedadesTexto} />
             </div>
           </div>
