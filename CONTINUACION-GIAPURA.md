@@ -66,15 +66,23 @@ producción**. `club.giapura.com.ar` sigue mostrando el código anterior:
 
 Datos del diagnóstico:
 - El build **local pasa sin errores** (`npm run build` OK en giapura-club).
-- El commit **está pusheado** a `origin/main`.
-- Conclusión: el deploy en **Vercel** de ese commit falló o quedó trabado.
+- Los commits **están pusheados** a `origin/main` (`9e7b549` y también `09abf27`).
+- **Se pushearon DOS commits seguidos y NINGUNO apareció en producción** → no es un problema
+  pasajero. Como el build local anda, el problema está **del lado de Vercel**: lo más probable
+  es que la **integración GitHub↔Vercel del proyecto giapura-club se haya desconectado / dejado
+  de auto-deployar**, o que los builds estén fallando en el entorno de Vercel.
 
-**Acción para resolver:**
+**Acción para resolver (es en el panel de Vercel, no en el código):**
 1. Vercel → proyecto **giapura-club** → pestaña **Deployments**.
-2. Mirar el deploy de más arriba (mensaje "copy final aprobado + negrita en textos").
-3. Si dice **Error/Failed** → abrir **Build Logs** y ver la causa. Si dice **Ready** pero igual
-   no se ve, hay caché/otra cosa: probar **Redeploy**.
-4. Si hace falta, **Redeploy** desde Vercel o pushear un commit nuevo para re-disparar.
+2. ¿Aparecen deploys nuevos con los mensajes "copy final aprobado…" / "Doc de continuación…"?
+   - **Si NO aparecen** → la integración con GitHub se cortó. Ir a **Settings → Git** y volver a
+     conectar el repo `fleonardi2008-debug/giapura-club` (o **Settings → Deployments** y revisar
+     que la Production Branch sea `main`). Después **Redeploy**.
+   - **Si aparecen en Error/Failed** → abrir **Build Logs** y leer las líneas rojas del final.
+   - **Si aparecen en Ready** pero igual no se ve → probar **Redeploy** (sin usar caché).
+3. Confirmar que quede online: `club.giapura.com.ar` debe mostrar el título
+   **"No te pierdas lo que viene."** y el botón **"Avisame cuando haya algo nuevo"**, y las frases
+   en **negrita** (sin `**` literales).
 
 > El copy que viene de la **base** (título "¿Qué significa ser Fundador?", textos, footer) YA se
 > ve, porque lo sirve el ERP. Lo que falta es solo lo que viene del **código** del club
