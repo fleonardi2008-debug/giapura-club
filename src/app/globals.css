@@ -78,8 +78,7 @@ body {
   mask: url("/logo.png") center / contain no-repeat;
 }
 
-.patron-claro {
-  background-color: var(--gold-bright);
+.patron-mask {
   -webkit-mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
   mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
 }

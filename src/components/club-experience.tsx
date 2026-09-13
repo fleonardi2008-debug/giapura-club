@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 import { toEmbedUrl } from "@/lib/embed";
 
 export type ClubContent = {
@@ -143,20 +143,32 @@ function Logo({ className = "" }: { className?: string }) {
   return <span role="img" aria-label="Giapura" className={`logo-mask block aspect-[1219/422] ${className}`} />;
 }
 
-function PatronClaro({ className }: { className: string }) {
+function Patron({ className }: { className: string }) {
   return (
-    <span aria-hidden="true" className={`patron-claro pointer-events-none absolute inset-0 -z-10 ${className}`} />
+    <span aria-hidden="true" className={`patron-mask pointer-events-none absolute inset-0 -z-10 ${className}`} />
   );
 }
 
 /* Fondo de sección: color sólido que en los bordes llega a la mitad del color vecino,
-   así dos secciones se funden en la unión. 5rem queda dentro del padding (mín. 6rem). */
-function Fondo({ color, antes, despues }: { color: string; antes?: string; despues?: string }) {
+   así dos secciones se funden en la unión. El alto del fundido tiene que caber en el padding. */
+function Fondo({
+  color,
+  antes,
+  despues,
+  altoAntes = "3rem",
+  altoDespues = "3rem",
+}: {
+  color: string;
+  antes?: string;
+  despues?: string;
+  altoAntes?: string;
+  altoDespues?: string;
+}) {
   const mitad = (otro: string) => `color-mix(in srgb, ${color} 50%, ${otro})`;
   const stops = [
     `${antes ? mitad(antes) : color} 0`,
-    `${color} 5rem`,
-    `${color} calc(100% - 5rem)`,
+    `${color} ${altoAntes}`,
+    `${color} calc(100% - ${altoDespues})`,
     `${despues ? mitad(despues) : color} 100%`,
   ];
   return (
@@ -275,35 +287,79 @@ function BotonCrema({ href, children, offsetClass }: { href: string; children: R
 }
 
 function TicketFundador() {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const resorte = { stiffness: 170, damping: 18 };
+  const rotX = useSpring(0, resorte);
+  const rotY = useSpring(0, resorte);
+  const brilloOpacidad = useSpring(0, resorte);
+  const brilloX = useMotionValue(50);
+  const brilloY = useMotionValue(0);
+  const brillo = useMotionTemplate`radial-gradient(circle at ${brilloX}% ${brilloY}%, rgba(255, 248, 230, 0.75), transparent 55%)`;
+
+  function inclinar(e: React.PointerEvent<HTMLDivElement>) {
+    if (reduce || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    rotY.set((x - 0.5) * 16);
+    rotX.set((0.5 - y) * 16);
+    brilloX.set(x * 100);
+    brilloY.set(y * 100);
+    brilloOpacidad.set(1);
+  }
+
+  function soltar() {
+    rotX.set(0);
+    rotY.set(0);
+    brilloOpacidad.set(0);
+  }
+
   return (
-    <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-dark p-8 text-paper shadow-[0_40px_90px_-45px_rgba(36,13,8,0.8)] sm:p-10">
-      <PatronClaro className="opacity-[0.06]" />
-      <div className="flex items-center justify-between gap-4">
-        <Logo className="h-7 bg-gold-bright" />
-        <span className="rounded-full border border-gold-bright/35 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.2em] text-gold-bright">
-          Acceso reservado
-        </span>
-      </div>
-      <p className="mt-10 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-paper/70">Club Fundadores</p>
-      <p className="font-display mt-2 text-[2.6rem] leading-none text-gold-bright">Pase Fundador</p>
-      <p className="mt-4 max-w-[30ch] leading-relaxed text-paper/80">
-        Para quienes confiaron en Giapura cuando todo esto recién empezaba.
-      </p>
-      <div className="relative my-8 border-t border-dashed border-paper/25">
-        <span aria-hidden="true" className="absolute -left-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-bg sm:-left-14" />
-        <span aria-hidden="true" className="absolute -right-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-bg sm:-right-14" />
-      </div>
-      <dl className="grid grid-cols-2 gap-6">
-        <div>
-          <dt className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-paper/70">Miembro desde</dt>
-          <dd className="font-display mt-1 text-xl text-paper">El principio</dd>
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 48, rotateX: 24 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 1.1, ease: EASE }}
+      style={{ transformPerspective: 1200 }}
+    >
+      <motion.div
+        ref={ref}
+        onPointerMove={inclinar}
+        onPointerDown={inclinar}
+        onPointerLeave={soltar}
+        onPointerCancel={soltar}
+        whileTap={reduce ? undefined : { scale: 0.97 }}
+        style={{
+          rotateX: rotX,
+          rotateY: rotY,
+          transformPerspective: 1200,
+          background: "linear-gradient(135deg, #f9e0ad 0%, #f5cf89 38%, #e2b56b 68%, #f5cf89 100%)",
+        }}
+        className="relative isolate touch-pan-y select-none overflow-hidden rounded-[1.75rem] p-8 text-dark shadow-[0_40px_90px_-40px_rgba(109,41,0,0.65)] ring-1 ring-gold/15 sm:p-10"
+      >
+        <Patron className="bg-gold opacity-[0.07]" />
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-[5]"
+          style={{ background: brillo, opacity: brilloOpacidad }}
+        />
+        <Logo className="h-8 bg-gold" />
+        <p className="mt-10 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-gold">Club Fundadores</p>
+        <p className="font-display mt-2 text-[2.6rem] leading-none text-dark">Pase Fundador</p>
+        <p className="mt-4 max-w-[30ch] leading-relaxed text-gold">
+          Para quienes confiaron en Giapura cuando todo esto recién empezaba.
+        </p>
+        <div className="relative my-8 border-t border-dashed border-gold/35">
+          <span aria-hidden="true" className="absolute -left-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-bg sm:-left-14" />
+          <span aria-hidden="true" className="absolute -right-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-bg sm:-right-14" />
         </div>
-        <div>
-          <dt className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-paper/70">Acceso</dt>
-          <dd className="font-display mt-1 text-xl text-paper">Solo Fundadores</dd>
-        </div>
-      </dl>
-    </div>
+        <dl>
+          <dt className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-gold">Miembro desde</dt>
+          <dd className="font-display mt-1 text-2xl text-dark">15/9</dd>
+        </dl>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -527,7 +583,7 @@ function MailPopup({ erpUrl }: { erpUrl: string }) {
         onClick={(e) => e.stopPropagation()}
         className="relative isolate w-full max-w-md overflow-hidden rounded-[1.75rem] border border-gold-bright/20 bg-dark p-8 text-left text-paper shadow-2xl outline-none sm:p-10"
       >
-        <PatronClaro className="opacity-[0.06]" />
+        <Patron className="bg-gold-bright opacity-[0.06]" />
         <button
           type="button"
           onClick={() => setAbierto(false)}
@@ -568,7 +624,7 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       <span aria-hidden="true" className="patron-mezcla pointer-events-none absolute inset-0 -z-10" />
 
       {/* Capítulo 1 — Bienvenida */}
-      <section className="relative overflow-hidden px-6 pb-24 pt-12 text-gold sm:pb-32">
+      <section className="relative overflow-hidden px-6 pb-14 pt-12 text-gold sm:pb-20">
         <Fondo color="var(--gold-bright)" despues="var(--bg)" />
         <header className="flex justify-center">
           <Logo className="h-16 bg-gold sm:h-24" />
@@ -611,8 +667,8 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       </section>
 
       {/* Capítulo 2 — Qué significa (crema + Pase Fundador) */}
-      <section className="relative px-6 py-24 sm:py-32">
-        <Fondo color="var(--bg)" antes="var(--gold-bright)" despues={trasIntro} />
+      <section className="relative px-6 pb-24 pt-14 sm:pb-28 sm:pt-20">
+        <Fondo color="var(--bg)" antes="var(--gold-bright)" despues={trasIntro} altoDespues="6rem" />
         <div className="mx-auto grid max-w-5xl items-start gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
           <div>
             <Eyebrow tono="claro">Tu lugar en Giapura</Eyebrow>
@@ -628,17 +684,15 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
             )}
           </div>
           <div className="lg:sticky lg:top-12">
-            <Reveal delay={0.1}>
-              <TicketFundador />
-            </Reveal>
+            <TicketFundador />
           </div>
         </div>
       </section>
 
       {/* Capítulo 3 — Reservado (marrón profundo) */}
       {hayReservado && (
-        <section className="relative overflow-hidden px-6 py-24 text-paper sm:py-32">
-          <Fondo color="var(--btn)" antes="var(--bg)" despues="var(--dark)" />
+        <section className="relative overflow-hidden px-6 pb-14 pt-24 text-paper sm:pb-20 sm:pt-28">
+          <Fondo color="var(--btn)" antes="var(--bg)" altoAntes="6rem" despues="var(--dark)" />
           <div className="mx-auto max-w-3xl">
             {bloques.length > 0 && (
               <div>
@@ -692,8 +746,10 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       )}
 
       {/* Capítulo 4 — Cierre (el más oscuro) */}
-      <section className="relative overflow-hidden px-6 pt-24 text-paper sm:pt-32">
-        <Fondo color="var(--dark)" antes={antesCierre} />
+      <section
+        className={`relative overflow-hidden px-6 text-paper ${hayReservado ? "pt-14 sm:pt-20" : "pt-24 sm:pt-28"}`}
+      >
+        <Fondo color="var(--dark)" antes={antesCierre} altoAntes={hayReservado ? "3rem" : "6rem"} />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 top-0 -z-[15] h-[30rem] w-[46rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-gold/45 blur-3xl"
