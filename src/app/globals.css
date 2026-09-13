@@ -52,17 +52,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -20;
-  pointer-events: none;
-  background: url("/patron-mani-marron.webp") repeat;
-  background-size: 380px;
-  opacity: 0.07;
-}
-
 ::selection {
   background: var(--gold);
   color: var(--paper);
@@ -73,10 +62,14 @@ body::after {
   letter-spacing: -0.01em;
 }
 
-.patron-oscuro {
-  background-color: var(--gold);
+/* Patrón continuo de toda la página: con "difference" se oscurece sobre fondos claros
+   y se aclara sobre oscuros, así acompaña los degradés sin cortarse entre secciones. */
+.patron-mezcla {
+  background-color: var(--gold-bright);
   -webkit-mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
   mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
+  mix-blend-mode: difference;
+  opacity: 0.08;
 }
 
 /* Logo y patrón recoloreables: toman el color de background-color */

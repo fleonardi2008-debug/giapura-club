@@ -149,6 +149,25 @@ function PatronClaro({ className }: { className: string }) {
   );
 }
 
+/* Fondo de sección: color sólido que en los bordes llega a la mitad del color vecino,
+   así dos secciones se funden en la unión. 5rem queda dentro del padding (mín. 6rem). */
+function Fondo({ color, antes, despues }: { color: string; antes?: string; despues?: string }) {
+  const mitad = (otro: string) => `color-mix(in srgb, ${color} 50%, ${otro})`;
+  const stops = [
+    `${antes ? mitad(antes) : color} 0`,
+    `${color} 5rem`,
+    `${color} calc(100% - 5rem)`,
+    `${despues ? mitad(despues) : color} 100%`,
+  ];
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-20"
+      style={{ background: `linear-gradient(to bottom, ${stops.join(", ")})` }}
+    />
+  );
+}
+
 function Eyebrow({ children, tono, centrado = false }: { children: ReactNode; tono: Tono; centrado?: boolean }) {
   const estilos = {
     claro: { linea: "bg-gold/40", texto: "text-gold" },
@@ -540,19 +559,22 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
   const descuento = content.bloques.find((b) => b.tipo === "DESCUENTO" && b.codigo);
   const bloques = content.bloques.filter((b) => b !== descuento);
   const hayReservado = bloques.length > 0 || historial.length > 0;
+  const trasIntro = hayReservado ? "var(--btn)" : "var(--dark)";
+  const antesCierre = hayReservado ? "var(--btn)" : "var(--bg)";
 
   return (
-    <main className="relative">
+    <main className="relative isolate">
       <MailPopup erpUrl={erpUrl} />
+      <span aria-hidden="true" className="patron-mezcla pointer-events-none absolute inset-0 -z-10" />
 
       {/* Capítulo 1 — Bienvenida */}
-      <section className="relative isolate overflow-hidden bg-gold-bright px-6 pb-24 pt-12 text-gold sm:pb-32">
-        <span aria-hidden="true" className="patron-oscuro pointer-events-none absolute inset-0 -z-10 opacity-[0.07]" />
+      <section className="relative overflow-hidden px-6 pb-24 pt-12 text-gold sm:pb-32">
+        <Fondo color="var(--gold-bright)" despues="var(--bg)" />
         <header className="flex justify-center">
           <Logo className="h-16 bg-gold sm:h-24" />
         </header>
 
-        <div className="mx-auto max-w-3xl pt-16 text-center sm:pt-20">
+        <div className="mx-auto max-w-3xl pt-6 text-center sm:pt-8">
           <Eyebrow tono="claro" centrado>
             Club Fundadores
           </Eyebrow>
@@ -589,7 +611,8 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       </section>
 
       {/* Capítulo 2 — Qué significa (crema + Pase Fundador) */}
-      <section className="px-6 py-24 sm:py-32">
+      <section className="relative px-6 py-24 sm:py-32">
+        <Fondo color="var(--bg)" antes="var(--gold-bright)" despues={trasIntro} />
         <div className="mx-auto grid max-w-5xl items-start gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
           <div>
             <Eyebrow tono="claro">Tu lugar en Giapura</Eyebrow>
@@ -614,8 +637,8 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
 
       {/* Capítulo 3 — Reservado (marrón profundo) */}
       {hayReservado && (
-        <section className="relative isolate overflow-hidden bg-btn px-6 py-24 text-paper sm:py-32">
-          <PatronClaro className="opacity-[0.05]" />
+        <section className="relative overflow-hidden px-6 py-24 text-paper sm:py-32">
+          <Fondo color="var(--btn)" antes="var(--bg)" despues="var(--dark)" />
           <div className="mx-auto max-w-3xl">
             {bloques.length > 0 && (
               <div>
@@ -669,11 +692,11 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       )}
 
       {/* Capítulo 4 — Cierre (el más oscuro) */}
-      <section className="relative isolate overflow-hidden bg-dark px-6 pt-24 text-paper sm:pt-32">
-        <PatronClaro className="opacity-[0.05]" />
+      <section className="relative overflow-hidden px-6 pt-24 text-paper sm:pt-32">
+        <Fondo color="var(--dark)" antes={antesCierre} />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[30rem] w-[46rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-gold/45 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-0 -z-[15] h-[30rem] w-[46rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-gold/45 blur-3xl"
         />
         <div className="mx-auto max-w-xl text-center">
           <Eyebrow tono="oscuro" centrado>
