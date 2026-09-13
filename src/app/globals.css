@@ -93,6 +93,31 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Brillo metálico del Ticket Fundador: bandas diagonales de luz que recorren la lámina. */
+.ticket-brillo {
+  background-image: linear-gradient(
+    120deg,
+    transparent 8%,
+    rgba(255, 238, 120, 0.8) 16%,
+    transparent 24%,
+    transparent 38%,
+    rgba(255, 246, 170, 0.9) 46%,
+    rgba(255, 220, 80, 0.5) 50%,
+    transparent 58%,
+    transparent 70%,
+    rgba(255, 232, 110, 0.7) 78%,
+    transparent 86%
+  );
+  background-size: 200% 200%;
+  mix-blend-mode: screen;
+  animation: ticket-brillo 7s ease-in-out infinite alternate;
+}
+
+@keyframes ticket-brillo {
+  from { background-position: 100% 100%; }
+  to { background-position: 0% 0%; }
+}
+
 /* Botón premium: brillo que barre */
 .btn-shine {
   position: relative;
@@ -120,4 +145,5 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .btn-shine > .shine { display: none; }
+  .ticket-brillo { animation: none; background-position: 60% 60%; }
 }

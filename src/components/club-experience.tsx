@@ -385,6 +385,7 @@ function TicketFundador() {
           <span className="sr-only">{volteado ? "Ver el frente del ticket" : "Dar vuelta el ticket"}</span>
 
           <span aria-hidden={volteado} className={cara} style={{ backgroundImage: "url(/ticket-frente.webp)" }}>
+            <span aria-hidden="true" className="ticket-brillo pointer-events-none absolute inset-0" />
             <MarcoTicket />
             {reflejo}
             <span className="relative flex h-full flex-col items-center justify-center px-[9%] text-center">
@@ -405,7 +406,7 @@ function TicketFundador() {
             className={cara}
             style={{ backgroundImage: "url(/ticket-dorso.webp)", transform: "rotateY(180deg)" }}
           >
-            <MarcoTicket />
+            <span aria-hidden="true" className="ticket-brillo pointer-events-none absolute inset-0" />
             {reflejo}
             <span className="relative flex h-full flex-col items-center justify-center gap-[3.5cqw]">
               <Logo className="h-[14.7cqw] bg-current" />
