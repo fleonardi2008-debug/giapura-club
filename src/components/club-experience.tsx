@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import { toEmbedUrl } from "@/lib/embed";
@@ -246,13 +246,13 @@ function Bloque({ bloque }: { bloque: ClubContent["bloques"][number] }) {
         </p>
       )}
 
-      {bloque.codigo && <CodigoChip codigo={bloque.codigo} />}
-
       {embed && (
         <div className="mt-7">
           <VideoEmbed url={embed} />
         </div>
       )}
+
+      {bloque.codigo && <CodigoChip codigo={bloque.codigo} />}
       {bloque.tipo === "IMAGEN" && bloque.mediaUrl && (
         <div className="mt-7 overflow-hidden rounded-2xl border border-line">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -265,7 +265,7 @@ function Bloque({ bloque }: { bloque: ClubContent["bloques"][number] }) {
           href={bloque.ctaUrl}
           target="_blank"
           rel="noreferrer"
-          className="btn-shine group/cta mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-btn px-7 py-3.5 text-sm font-medium text-paper outline-none transition-transform duration-300 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+          className="btn-shine group/cta mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-btn px-7 py-3.5 text-sm font-medium text-paper outline-none transition duration-300 hover:-translate-y-0.5 hover:bg-btn-hover focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
         >
           <span className="shine" />
           {bloque.ctaTexto}
@@ -276,7 +276,15 @@ function Bloque({ bloque }: { bloque: ClubContent["bloques"][number] }) {
   );
 }
 
-function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null }) {
+function NovedadesForm({
+  erpUrl,
+  texto,
+  apilado = false,
+}: {
+  erpUrl: string;
+  texto: string | null;
+  apilado?: boolean;
+}) {
   const [email, setEmail] = useState("");
   const [estado, setEstado] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
@@ -316,7 +324,10 @@ function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null
           {renderRich(texto)}
         </p>
       )}
-      <form onSubmit={submit} className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+      <form
+        onSubmit={submit}
+        className={`flex w-full max-w-md flex-col gap-3 ${apilado ? "" : "sm:flex-row"}`}
+      >
         <label htmlFor="club-email" className="sr-only">
           Tu correo electrónico
         </label>
@@ -333,7 +344,7 @@ function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null
         <button
           type="submit"
           disabled={estado === "loading"}
-          className="btn-shine h-13 cursor-pointer rounded-full bg-btn px-8 py-3.5 text-sm font-medium text-paper outline-none transition-transform duration-300 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:cursor-wait disabled:opacity-60"
+          className="btn-shine h-13 cursor-pointer rounded-full bg-btn px-8 py-3.5 text-sm font-medium text-paper outline-none transition duration-300 hover:-translate-y-0.5 hover:bg-btn-hover focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:cursor-wait disabled:opacity-60"
         >
           <span className="shine" />
           {estado === "loading" ? "Enviando…" : "Avisame cuando haya algo nuevo"}
@@ -342,6 +353,74 @@ function NovedadesForm({ erpUrl, texto }: { erpUrl: string; texto: string | null
       {estado === "error" && (
         <p className="text-sm text-gold">Algo falló. Probá de nuevo en un momento.</p>
       )}
+    </div>
+  );
+}
+
+const POPUP_KEY = "club-popup-visto";
+
+function MailPopup({ erpUrl }: { erpUrl: string }) {
+  const [abierto, setAbierto] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(POPUP_KEY)) return;
+    } catch {
+      /* storage bloqueado: mostramos igual */
+    }
+    const t = setTimeout(() => setAbierto(true), 8000);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!abierto) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && cerrar();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [abierto]);
+
+  function cerrar() {
+    setAbierto(false);
+    try {
+      localStorage.setItem(POPUP_KEY, "1");
+    } catch {}
+  }
+
+  if (!abierto) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-dark/60 px-5 backdrop-blur-sm"
+      onClick={cerrar}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="popup-titulo"
+    >
+      <div
+        className="relative w-full max-w-md rounded-[1.75rem] bg-bg-2 p-8 shadow-2xl sm:p-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={cerrar}
+          aria-label="Cerrar"
+          className="absolute right-4 top-4 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-bg-3"
+        >
+          <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+        <p className="text-[0.7rem] font-medium uppercase tracking-[0.28em] text-gold">Solo Fundadores</p>
+        <h2 id="popup-titulo" className="font-display mt-3 text-[1.8rem] leading-tight text-cream">
+          No te pierdas lo que viene.
+        </h2>
+        <p className="mt-3 text-cream-dim">
+          Dejame tu mail y te aviso cada vez que haya algo nuevo para vos.
+        </p>
+        <div className="mt-6">
+          <NovedadesForm erpUrl={erpUrl} texto={null} apilado />
+        </div>
+      </div>
     </div>
   );
 }
@@ -367,11 +446,14 @@ export function ClubExperience({
   content: ClubContent;
   erpUrl: string;
 }) {
-  const { config, bloques, historial } = content;
+  const { config, historial } = content;
   const heroEmbed = toEmbedUrl(config.heroVideoUrl);
+  const descuento = content.bloques.find((b) => b.tipo === "DESCUENTO" && b.codigo);
+  const bloques = content.bloques.filter((b) => b !== descuento);
 
   return (
     <main className="relative">
+      <MailPopup erpUrl={erpUrl} />
       {/* Aurora sutil de fondo */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="animate-aurora absolute -left-40 top-0 h-[28rem] w-[28rem] rounded-full bg-gold-bright/15 blur-3xl" />
@@ -411,6 +493,18 @@ export function ClubExperience({
             {heroEmbed ? <VideoEmbed url={heroEmbed} /> : <VideoPlaceholder />}
           </div>
         </RevealOnLoad>
+        {descuento?.codigo && (
+          <RevealOnLoad delay={0.5}>
+            <div className="mx-auto max-w-md text-left">
+              {descuento.titulo && (
+                <p className="font-display mt-10 text-center text-xl text-cream sm:text-2xl">
+                  {descuento.titulo}
+                </p>
+              )}
+              <CodigoChip codigo={descuento.codigo} />
+            </div>
+          </RevealOnLoad>
+        )}
       </section>
 
       {/* Qué significa este acceso */}

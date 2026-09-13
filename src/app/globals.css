@@ -1,21 +1,29 @@
-@import url("https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=general-sans@400,500,600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap");
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Aileron";
+  src: url("https://cdn.shopify.com/s/files/1/0995/7068/0129/files/Aileron-Bold.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
 
 :root {
   /* Superficies */
-  --bg: #ece1cc;          /* Beige tostado — fondo principal */
-  --bg-2: #f5eedf;        /* Crema claro — secciones alternadas */
+  --bg: #ece1cc;          /* Crema claro — fondo principal */
+  --bg-2: #f5eedf;        /* Crema más pálido — secciones alternadas */
   --bg-3: #e4d6bb;        /* Beige más profundo — tarjetas */
-  --dark: #240d08;        /* Marrón casi negro — secciones oscuras */
+  --dark: #240d08;        /* Fondo oscuro (Ticket Fundador) */
   /* Texto */
   --cream: #240d08;       /* Texto principal (sobre claro) */
-  --cream-dim: #5a3a28;   /* Texto secundario */
-  --muted: #8a6f52;       /* Texto terciario / labels */
+  --cream-dim: #3f1d0e;   /* Texto secundario */
+  --muted: #6d2900;       /* Texto/ícono atenuado marrón */
   --paper: #f5eedf;       /* Texto sobre secciones oscuras */
   /* Acentos de marca */
-  --gold: #6d2900;        /* Marrón Cacao */
-  --gold-bright: #f5cf89; /* Beige Natural (maní) */
-  --btn: #80613b;         /* Marrón botón (pill) */
+  --gold: #6d2900;        /* Acento marrón-dorado */
+  --gold-bright: #f5cf89; /* Dorado brillante */
+  --btn: #4a1c05;         /* Fondo de botón sólido */
+  --btn-hover: #351203;   /* Botón en hover */
   --line: rgba(36, 13, 8, 0.14);
 }
 
@@ -31,16 +39,28 @@
   --color-gold: var(--gold);
   --color-gold-bright: var(--gold-bright);
   --color-btn: var(--btn);
+  --color-btn-hover: var(--btn-hover);
   --color-line: var(--line);
-  --font-display: "Clash Display", ui-sans-serif, sans-serif;
-  --font-sans: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, serif;
+  --font-sans: "Aileron", "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
   background: var(--bg);
   color: var(--cream);
-  font-family: "General Sans", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Aileron", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  pointer-events: none;
+  background: url("/patron-mani-marron.webp") repeat;
+  background-size: 380px;
+  opacity: 0.07;
 }
 
 ::selection {
@@ -49,8 +69,8 @@ body {
 }
 
 .font-display {
-  font-family: "Clash Display", ui-sans-serif, sans-serif;
-  letter-spacing: -0.02em;
+  font-family: "Playfair Display", ui-serif, serif;
+  letter-spacing: -0.01em;
 }
 
 .text-gradient-gold {
