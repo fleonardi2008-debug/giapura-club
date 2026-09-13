@@ -28,7 +28,7 @@ export type ClubContent = {
 };
 
 type Bloque = ClubContent["bloques"][number];
-type Tono = "claro" | "oscuro" | "caramelo";
+type Tono = "claro" | "oscuro";
 
 const TIPO_LABEL: Record<string, string> = {
   TEXTO: "Novedad",
@@ -140,7 +140,7 @@ function RevealOnLoad({ children, delay = 0, y = 24 }: { children: ReactNode; de
 /* ---------- Marca ---------- */
 
 function Logo({ className = "" }: { className?: string }) {
-  return <span role="img" aria-label="Giapura" className={`logo-mask block aspect-[1216/433] ${className}`} />;
+  return <span role="img" aria-label="Giapura" className={`logo-mask block aspect-[1219/422] ${className}`} />;
 }
 
 function PatronClaro({ className }: { className: string }) {
@@ -153,7 +153,6 @@ function Eyebrow({ children, tono, centrado = false }: { children: ReactNode; to
   const estilos = {
     claro: { linea: "bg-gold/40", texto: "text-gold" },
     oscuro: { linea: "bg-gold-bright/50", texto: "text-gold-bright" },
-    caramelo: { linea: "bg-paper/60", texto: "text-paper" },
   }[tono];
   return (
     <div className={`flex items-center gap-3 ${centrado ? "justify-center" : ""}`}>
@@ -182,18 +181,18 @@ function VideoEmbed({ url }: { url: string }) {
 
 function VideoPlaceholder() {
   return (
-    <div className="flex aspect-video w-full items-center justify-center rounded-3xl border border-paper/15 bg-dark/35 text-center">
+    <div className="flex aspect-video w-full items-center justify-center rounded-3xl border border-gold/20 bg-gold/[0.08] text-center">
       <div className="space-y-4 px-6">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-gold-bright/40 bg-dark/40">
-          <IconPlay className="ml-0.5 h-5 w-5 text-gold-bright" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-gold/30 bg-gold-bright">
+          <IconPlay className="ml-0.5 h-5 w-5 text-gold" />
         </div>
-        <p className="text-sm text-paper">Un mensaje para vos. Muy pronto.</p>
+        <p className="text-sm text-gold">Un mensaje para vos. Muy pronto.</p>
       </div>
     </div>
   );
 }
 
-function CodigoChip({ codigo, offsetClass }: { codigo: string; offsetClass: string }) {
+function CodigoChip({ codigo, focusClass }: { codigo: string; focusClass: string }) {
   const [copiado, setCopiado] = useState(false);
 
   async function copiar() {
@@ -212,7 +211,7 @@ function CodigoChip({ codigo, offsetClass }: { codigo: string; offsetClass: stri
         type="button"
         onClick={copiar}
         aria-label={`Copiar el código ${codigo}`}
-        className={`group/codigo flex w-full cursor-pointer items-center justify-between gap-4 rounded-2xl border border-gold-bright/25 bg-dark px-6 py-5 text-left outline-none transition-colors duration-200 hover:border-gold-bright/60 focus-visible:ring-2 focus-visible:ring-gold-bright focus-visible:ring-offset-2 ${offsetClass}`}
+        className={`group/codigo flex w-full cursor-pointer items-center justify-between gap-4 rounded-2xl border border-gold-bright/25 bg-dark px-6 py-5 text-left outline-none transition-colors duration-200 hover:border-gold-bright/60 focus-visible:ring-2 focus-visible:ring-offset-2 ${focusClass}`}
       >
         <span className="min-w-0">
           <span className="block text-[0.7rem] font-medium uppercase tracking-[0.24em] text-paper/70">
@@ -324,7 +323,7 @@ function BloqueCard({ bloque }: { bloque: Bloque }) {
 
       {bloque.codigo && (
         <div className="mt-7">
-          <CodigoChip codigo={bloque.codigo} offsetClass={offset} />
+          <CodigoChip codigo={bloque.codigo} focusClass={`focus-visible:ring-gold-bright ${offset}`} />
         </div>
       )}
 
@@ -546,26 +545,22 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
     <main className="relative">
       <MailPopup erpUrl={erpUrl} />
 
-      {/* Capítulo 1 — Bienvenida (caramelo) */}
-      <section className="bg-caramelo relative isolate overflow-hidden px-6 pb-24 pt-10 text-paper sm:pb-32">
-        <PatronClaro className="opacity-[0.08]" />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-64 bg-gradient-to-t from-dark/40 to-transparent"
-        />
+      {/* Capítulo 1 — Bienvenida */}
+      <section className="relative isolate overflow-hidden bg-gold-bright px-6 pb-24 pt-12 text-gold sm:pb-32">
+        <span aria-hidden="true" className="patron-oscuro pointer-events-none absolute inset-0 -z-10 opacity-[0.07]" />
         <header className="flex justify-center">
-          <Logo className="h-9 bg-paper" />
+          <Logo className="h-16 bg-gold sm:h-24" />
         </header>
 
-        <div className="mx-auto max-w-3xl pt-20 text-center sm:pt-24">
-          <Eyebrow tono="caramelo" centrado>
+        <div className="mx-auto max-w-3xl pt-16 text-center sm:pt-20">
+          <Eyebrow tono="claro" centrado>
             Club Fundadores
           </Eyebrow>
-          <h1 className="font-display mx-auto mt-6 max-w-[16ch] text-[2.6rem] leading-[1.04] text-balance text-paper sm:text-[3.8rem]">
+          <h1 className="font-display mx-auto mt-6 max-w-[16ch] text-[2.6rem] leading-[1.04] text-balance text-gold sm:text-[3.8rem]">
             {config.heroTitulo}
           </h1>
           {config.heroSubtitulo && (
-            <p className="mx-auto mt-7 max-w-[46ch] text-lg leading-relaxed text-paper sm:text-xl">
+            <p className="mx-auto mt-7 max-w-[46ch] text-lg leading-relaxed text-gold sm:text-xl">
               {config.heroSubtitulo}
             </p>
           )}
@@ -573,28 +568,23 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
             <div className="mt-14">{heroEmbed ? <VideoEmbed url={heroEmbed} /> : <VideoPlaceholder />}</div>
           </RevealOnLoad>
 
-          {descuento?.codigo && (
-            <div className="mx-auto mt-10 max-w-md text-left">
-              <p className="text-center text-[0.72rem] font-medium uppercase tracking-[0.28em] text-paper">
-                {descuento.titulo ?? "Tu beneficio de Fundador"}
-              </p>
-              <div className="mt-4">
-                <CodigoChip codigo={descuento.codigo} offsetClass="focus-visible:ring-offset-gold" />
-              </div>
-              {descuento.cuerpo && (
-                <p className="mt-4 whitespace-pre-line text-center text-sm leading-relaxed text-paper">
-                  {descuento.cuerpo}
-                </p>
-              )}
-              {descuento.ctaTexto && descuento.ctaUrl && (
-                <div className="mt-6 flex justify-center">
-                  <BotonCrema href={descuento.ctaUrl} offsetClass="focus-visible:ring-offset-gold">
-                    {descuento.ctaTexto}
-                  </BotonCrema>
+          <div className="mx-auto mt-14 max-w-md">
+            <h2 className="font-display text-[1.9rem] leading-tight text-gold sm:text-[2.3rem]">Tu primer regalo</h2>
+            <div className="mt-5 text-left">
+              {descuento?.codigo ? (
+                <CodigoChip
+                  codigo={descuento.codigo}
+                  focusClass="focus-visible:ring-gold focus-visible:ring-offset-gold-bright"
+                />
+              ) : (
+                <div className="rounded-2xl border border-dashed border-gold/40 px-6 py-5 text-center">
+                  <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-gold">Tu código</p>
+                  <p className="font-display mt-1.5 text-2xl text-gold">Muy pronto</p>
                 </div>
               )}
             </div>
-          )}
+            <p className="mt-4 text-sm text-gold">Canjealo en tu próxima compra online.</p>
+          </div>
         </div>
       </section>
 

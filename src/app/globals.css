@@ -73,9 +73,10 @@ body::after {
   letter-spacing: -0.01em;
 }
 
-/* Textura caramelo del hero */
-.bg-caramelo {
-  background: linear-gradient(120deg, #a4551d, #6d2900 55%, #753b18);
+.patron-oscuro {
+  background-color: var(--gold);
+  -webkit-mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
+  mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
 }
 
 /* Logo y patrón recoloreables: toman el color de background-color */
