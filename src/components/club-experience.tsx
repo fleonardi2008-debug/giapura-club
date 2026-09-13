@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { toEmbedUrl } from "@/lib/embed";
 
 export type ClubContent = {
@@ -149,33 +156,26 @@ function Patron({ className }: { className: string }) {
   );
 }
 
-/* Fondo de sección: color sólido que en los bordes llega a la mitad del color vecino,
-   así dos secciones se funden en la unión. El alto del fundido tiene que caber en el padding. */
-function Fondo({
-  color,
-  antes,
-  despues,
-  altoAntes = "3rem",
-  altoDespues = "3rem",
-}: {
-  color: string;
-  antes?: string;
-  despues?: string;
-  altoAntes?: string;
-  altoDespues?: string;
-}) {
-  const mitad = (otro: string) => `color-mix(in srgb, ${color} 50%, ${otro})`;
-  const stops = [
-    `${antes ? mitad(antes) : color} 0`,
-    `${color} ${altoAntes}`,
-    `${color} calc(100% - ${altoDespues})`,
-    `${despues ? mitad(despues) : color} 100%`,
-  ];
+function Fondo({ color }: { color: string }) {
+  return (
+    <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20" style={{ background: color }} />
+  );
+}
+
+/* Fundido que cruza el borde entre dos secciones con curva suave (smoothstep): sin quiebre de
+   pendiente no aparece la línea en la unión. La mitad del alto tiene que caber en el padding. */
+function Union({ desde, hacia, alto }: { desde: string; hacia: string; alto: string }) {
+  const pasos = 12;
+  const stops = Array.from({ length: pasos + 1 }, (_, i) => {
+    const t = i / pasos;
+    const s = t * t * (3 - 2 * t);
+    return `color-mix(in srgb, ${hacia} ${(s * 100).toFixed(1)}%, ${desde}) ${(t * 100).toFixed(1)}%`;
+  });
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-20"
-      style={{ background: `linear-gradient(to bottom, ${stops.join(", ")})` }}
+      className="pointer-events-none absolute inset-x-0 -z-[18]"
+      style={{ top: `calc(${alto} / -2)`, height: alto, background: `linear-gradient(to bottom, ${stops.join(", ")})` }}
     />
   );
 }
@@ -286,24 +286,62 @@ function BotonCrema({ href, children, offsetClass }: { href: string; children: R
   );
 }
 
+/* Marco del ticket impreso, tomado del PDF original (coordenadas en puntos, eje Y invertido). */
+function MarcoTicket() {
+  return (
+    <svg
+      viewBox="0 0 340.157 170.079"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+    >
+      <g transform="matrix(1 0 0 -1 0 170.079)">
+        <path
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.2}
+          vectorEffect="non-scaling-stroke"
+          transform="translate(9.5223 14.7521)"
+          d="M0 0C0.651 -0.13 1.303 -0.26 1.954 -0.39C2.364 -0.551 3.976 -1.242 4.802 -3.085C5.203 -3.981 5.27 -4.817 5.268 -5.337C108.666 -5.275 212.064 -5.213 315.462 -5.152C315.686 -4.343 315.909 -3.535 316.133 -2.726C316.343 -2.289 316.953 -1.17 318.227 -0.48C319.039 -0.04 319.792 0.046 320.237 0.059C320.513 46.498 320.79 92.938 321.066 139.377C320.52 139.411 319.581 139.545 318.562 140.113C317.329 140.8 316.622 141.764 316.3 142.269C315.937 143.257 315.574 144.246 315.211 145.234L5.268 146.597C5.3 146.451 5.787 144.014 4.097 142.203C2.408 140.391 0.136 140.913 0 140.947Z"
+        />
+        <g fill="currentColor">
+          <ellipse cx="9.442" cy="161.693" rx="0.9" ry="0.9" />
+          <ellipse cx="9.819" cy="8.227" rx="0.9" ry="0.9" />
+          <ellipse cx="330.872" cy="8.451" rx="0.9" ry="0.9" />
+          <ellipse cx="330.747" cy="160.506" rx="0.9" ry="0.9" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 function TicketFundador() {
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
+  const [volteado, setVolteado] = useState(false);
   const resorte = { stiffness: 170, damping: 18 };
+  const giro = useSpring(0, { stiffness: 90, damping: 15 });
   const rotX = useSpring(0, resorte);
   const rotY = useSpring(0, resorte);
+  const rotYTotal = useTransform(() => giro.get() + rotY.get());
   const brilloOpacidad = useSpring(0, resorte);
   const brilloX = useMotionValue(50);
   const brilloY = useMotionValue(0);
-  const brillo = useMotionTemplate`radial-gradient(circle at ${brilloX}% ${brilloY}%, rgba(255, 248, 230, 0.75), transparent 55%)`;
+  const brillo = useMotionTemplate`radial-gradient(circle at ${brilloX}% ${brilloY}%, rgba(255, 244, 214, 0.6), transparent 55%)`;
 
-  function inclinar(e: React.PointerEvent<HTMLDivElement>) {
-    if (reduce || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
+  function voltear() {
+    const siguiente = !volteado;
+    setVolteado(siguiente);
+    if (reduce) giro.jump(siguiente ? 180 : 0);
+    else giro.set(siguiente ? 180 : 0);
+  }
+
+  function inclinar(e: React.PointerEvent<HTMLButtonElement>) {
+    if (reduce || e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
-    rotY.set((x - 0.5) * 16);
-    rotX.set((0.5 - y) * 16);
+    rotY.set((x - 0.5) * 12);
+    rotX.set((0.5 - y) * 12);
     brilloX.set(x * 100);
     brilloY.set(y * 100);
     brilloOpacidad.set(1);
@@ -315,51 +353,71 @@ function TicketFundador() {
     brilloOpacidad.set(0);
   }
 
+  const cara =
+    "absolute inset-0 overflow-hidden rounded-md bg-[#d99947] bg-cover bg-center text-btn shadow-[0_30px_60px_-28px_rgba(36,13,8,0.6)] [backface-visibility:hidden]";
+  const reflejo = (
+    <motion.span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0"
+      style={{ background: brillo, opacity: brilloOpacidad }}
+    />
+  );
+
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 48, rotateX: 24 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 1.1, ease: EASE }}
-      style={{ transformPerspective: 1200 }}
-    >
+    <div className="@container">
       <motion.div
-        ref={ref}
-        onPointerMove={inclinar}
-        onPointerDown={inclinar}
-        onPointerLeave={soltar}
-        onPointerCancel={soltar}
-        whileTap={reduce ? undefined : { scale: 0.97 }}
-        style={{
-          rotateX: rotX,
-          rotateY: rotY,
-          transformPerspective: 1200,
-          background: "linear-gradient(135deg, #f9e0ad 0%, #f5cf89 38%, #e2b56b 68%, #f5cf89 100%)",
-        }}
-        className="relative isolate touch-pan-y select-none overflow-hidden rounded-[1.75rem] p-8 text-dark shadow-[0_40px_90px_-40px_rgba(109,41,0,0.65)] ring-1 ring-gold/15 sm:p-10"
+        initial={reduce ? false : { opacity: 0, y: 48, rotateX: 24 }}
+        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 1.1, ease: EASE }}
+        style={{ transformPerspective: 1400 }}
       >
-        <Patron className="bg-gold opacity-[0.07]" />
-        <motion.span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-[5]"
-          style={{ background: brillo, opacity: brilloOpacidad }}
-        />
-        <Logo className="h-8 bg-gold" />
-        <p className="mt-10 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-gold">Club Fundadores</p>
-        <p className="font-display mt-2 text-[2.6rem] leading-none text-dark">Pase Fundador</p>
-        <p className="mt-4 max-w-[30ch] leading-relaxed text-gold">
-          Para quienes confiaron en Giapura cuando todo esto recién empezaba.
-        </p>
-        <div className="relative my-8 border-t border-dashed border-gold/35">
-          <span aria-hidden="true" className="absolute -left-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-bg sm:-left-14" />
-          <span aria-hidden="true" className="absolute -right-12 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-bg sm:-right-14" />
-        </div>
-        <dl>
-          <dt className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-gold">Miembro desde</dt>
-          <dd className="font-display mt-1 text-2xl text-dark">15/9</dd>
-        </dl>
+        <motion.button
+          type="button"
+          onClick={voltear}
+          onPointerMove={inclinar}
+          onPointerLeave={soltar}
+          aria-pressed={volteado}
+          whileTap={reduce ? undefined : { scale: 0.98 }}
+          style={{ rotateX: rotX, rotateY: rotYTotal, transformPerspective: 1400, transformStyle: "preserve-3d" }}
+          className="relative block aspect-[16/10] w-full cursor-pointer rounded-md outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg sm:aspect-[2/1]"
+        >
+          <span className="sr-only">{volteado ? "Ver el frente del ticket" : "Dar vuelta el ticket"}</span>
+
+          <span aria-hidden={volteado} className={cara} style={{ backgroundImage: "url(/ticket-frente.webp)" }}>
+            <MarcoTicket />
+            {reflejo}
+            <span className="relative flex h-full flex-col items-center justify-center px-[9%] text-center">
+              <span className="font-display block whitespace-nowrap text-[9cqw] leading-none">TICKET FUNDADOR</span>
+              <span className="mt-[2.2cqw] block max-w-[34ch] text-[max(2.8cqw,11px)] font-medium leading-snug">
+                Este ticket acredita que formaste parte de la primer tanda nacional de Giapura.
+              </span>
+              <span className="mt-[2.6cqw] flex w-[78%] items-center gap-[2cqw]">
+                <span aria-hidden="true" className="h-px flex-1 bg-current" />
+                <span className="whitespace-nowrap text-[max(2.6cqw,11px)] font-bold">Miembro desde 15/9</span>
+                <span aria-hidden="true" className="h-px flex-1 bg-current" />
+              </span>
+            </span>
+          </span>
+
+          <span
+            aria-hidden={!volteado}
+            className={cara}
+            style={{ backgroundImage: "url(/ticket-dorso.webp)", transform: "rotateY(180deg)" }}
+          >
+            <MarcoTicket />
+            {reflejo}
+            <span className="relative flex h-full flex-col items-center justify-center gap-[3.5cqw]">
+              <Logo className="h-[14.7cqw] bg-current" />
+              <span className="block text-[max(4.8cqw,15px)] font-bold leading-none tracking-[-0.02em]">
+                Volvé a lo simple y real.
+              </span>
+            </span>
+          </span>
+        </motion.button>
       </motion.div>
-    </motion.div>
+      <p className="mt-4 text-center text-sm text-gold">Tocalo para darlo vuelta</p>
+    </div>
   );
 }
 
@@ -615,7 +673,6 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
   const descuento = content.bloques.find((b) => b.tipo === "DESCUENTO" && b.codigo);
   const bloques = content.bloques.filter((b) => b !== descuento);
   const hayReservado = bloques.length > 0 || historial.length > 0;
-  const trasIntro = hayReservado ? "var(--btn)" : "var(--dark)";
   const antesCierre = hayReservado ? "var(--btn)" : "var(--bg)";
 
   return (
@@ -625,7 +682,7 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
 
       {/* Capítulo 1 — Bienvenida */}
       <section className="relative overflow-hidden px-6 pb-14 pt-12 text-gold sm:pb-20">
-        <Fondo color="var(--gold-bright)" despues="var(--bg)" />
+        <Fondo color="var(--gold-bright)" />
         <header className="flex justify-center">
           <Logo className="h-16 bg-gold sm:h-24" />
         </header>
@@ -668,8 +725,9 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
 
       {/* Capítulo 2 — Qué significa (crema + Pase Fundador) */}
       <section className="relative px-6 pb-24 pt-14 sm:pb-28 sm:pt-20">
-        <Fondo color="var(--bg)" antes="var(--gold-bright)" despues={trasIntro} altoDespues="6rem" />
-        <div className="mx-auto grid max-w-5xl items-start gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
+        <Fondo color="var(--bg)" />
+        <Union desde="var(--gold-bright)" hacia="var(--bg)" alto="6rem" />
+        <div className="mx-auto max-w-3xl">
           <div>
             <Eyebrow tono="claro">Tu lugar en Giapura</Eyebrow>
             <Reveal>
@@ -683,7 +741,7 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
               </p>
             )}
           </div>
-          <div className="lg:sticky lg:top-12">
+          <div className="mt-14">
             <TicketFundador />
           </div>
         </div>
@@ -691,8 +749,9 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
 
       {/* Capítulo 3 — Reservado (marrón profundo) */}
       {hayReservado && (
-        <section className="relative overflow-hidden px-6 pb-14 pt-24 text-paper sm:pb-20 sm:pt-28">
-          <Fondo color="var(--btn)" antes="var(--bg)" altoAntes="6rem" despues="var(--dark)" />
+        <section className="relative px-6 pb-14 pt-24 text-paper sm:pb-20 sm:pt-28">
+          <Fondo color="var(--btn)" />
+          <Union desde="var(--bg)" hacia="var(--btn)" alto="12rem" />
           <div className="mx-auto max-w-3xl">
             {bloques.length > 0 && (
               <div>
@@ -747,13 +806,10 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
 
       {/* Capítulo 4 — Cierre (el más oscuro) */}
       <section
-        className={`relative overflow-hidden px-6 text-paper ${hayReservado ? "pt-14 sm:pt-20" : "pt-24 sm:pt-28"}`}
+        className={`relative px-6 text-paper ${hayReservado ? "pt-14 sm:pt-20" : "pt-24 sm:pt-28"}`}
       >
-        <Fondo color="var(--dark)" antes={antesCierre} altoAntes={hayReservado ? "3rem" : "6rem"} />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-0 -z-[15] h-[30rem] w-[46rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-gold/45 blur-3xl"
-        />
+        <Fondo color="var(--dark)" />
+        <Union desde={antesCierre} hacia="var(--dark)" alto={hayReservado ? "6rem" : "12rem"} />
         <div className="mx-auto max-w-xl text-center">
           <Eyebrow tono="oscuro" centrado>
             Solo Fundadores
