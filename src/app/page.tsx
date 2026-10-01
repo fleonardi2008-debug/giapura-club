@@ -13,6 +13,8 @@ const FALLBACK: ClubContent = {
       "Ser Fundador significa haber confiado en Giapura cuando todo esto recién empezaba.\n\nY por haber estado desde el principio, vas a tener acceso a cosas que no van a estar disponibles para todos.\n\nPuede ser:\n\n**Un lanzamiento antes que nadie.**\n**Un descuento exclusivo.**\n**Una encuesta para decidir algo importante de Giapura.**\n**Un beneficio especial.**\n\nO algo que todavía ni siquiera existe.\n\nNo hay una lista de beneficios cerrada.\n\nPorque quiero que el Club Fundadores crezca junto con Giapura.\n\nLo que sí te puedo asegurar es que, cuando haya algo reservado para Fundadores, **vos vas a poder acceder.**",
     novedadesTexto:
       "Cada tanto voy a abrir algo exclusivamente para Fundadores.\n\nY no quiero que tengas que acordarte de entrar a esta página para enterarte.\n\nDejame tu mail y te voy a avisar directamente cada vez que haya algo nuevo.\n\n**Sin newsletters.\nSin spam.\nSolo cuando haya algo para vos.**",
+    feedbackTexto: null,
+    feedbackUrl: null,
     footerTexto: "Gracias por haber estado desde el principio. — Fran",
   },
   bloques: [],

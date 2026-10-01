@@ -19,6 +19,8 @@ export type ClubContent = {
     introTitulo: string;
     introTexto: string | null;
     novedadesTexto: string | null;
+    feedbackTexto: string | null;
+    feedbackUrl: string | null;
     footerTexto: string;
   };
   bloques: {
@@ -47,6 +49,50 @@ const TIPO_LABEL: Record<string, string> = {
 };
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+const TIENDA_URL = "https://giapura.com.ar";
+
+/* Reglas de GiaPlus (las 4 placas de la guía). Puntos por cada $10.000 de compra. */
+const GIAPLUS_NIVELES = [
+  { nombre: "Maní Cero", descripcion: "Acabás de entrar al mundo Giapura.", puntos: 30 },
+  { nombre: "Manija", descripcion: "Ya no comprás pasta de maní. La necesitás.", puntos: 40 },
+  { nombre: "Maníatico", descripcion: "Llegaste a otro nivel de obsesión.", puntos: 50 },
+  { nombre: "Fundador", descripcion: "El nivel más alto.", puntos: 75 },
+];
+
+const GIAPLUS_FORMAS = [
+  {
+    grupo: "Comprando",
+    items: [
+      { texto: "Tu primera compra", puntos: 100 },
+      { texto: "Llegar a 5 compras", puntos: 100 },
+      { texto: "Pasar cierto monto en una compra", puntos: 250 },
+    ],
+  },
+  {
+    grupo: "En Instagram",
+    items: [
+      { texto: "Seguir a Giapura", puntos: 15 },
+      { texto: "Subir una historia", puntos: 30 },
+    ],
+  },
+  {
+    grupo: "Invitando amigos",
+    items: [
+      { texto: "Por cada amigo que invitás", puntos: 30 },
+      { texto: "Tu amigo arranca con", puntos: 50 },
+      { texto: "Cuando tu amigo compra, sumás", puntos: 50 },
+    ],
+  },
+  {
+    grupo: "Una sola vez",
+    items: [
+      { texto: "Registrarte en GiaPlus", puntos: 15 },
+      { texto: "Suscribirte al newsletter", puntos: 15 },
+      { texto: "Tu cumpleaños", puntos: 50 },
+    ],
+  },
+];
 
 /* Soporta **negrita** y saltos de línea (el contenedor usa whitespace-pre-line). */
 function renderRich(text: string, strongClass: string): ReactNode {
@@ -674,7 +720,6 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
   const descuento = content.bloques.find((b) => b.tipo === "DESCUENTO" && b.codigo);
   const bloques = content.bloques.filter((b) => b !== descuento);
   const hayReservado = bloques.length > 0 || historial.length > 0;
-  const antesCierre = hayReservado ? "var(--btn)" : "var(--bg)";
 
   return (
     <main className="relative isolate">
@@ -748,11 +793,108 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
         </div>
       </section>
 
-      {/* Capítulo 3 — Reservado (marrón profundo) */}
+      {/* Capítulo 3 — GiaPlus (marrón profundo) */}
+      <section className="relative px-6 pb-14 pt-24 text-paper sm:pb-20 sm:pt-28">
+        <Fondo color="var(--btn)" />
+        <Union desde="var(--bg)" hacia="var(--btn)" alto="12rem" />
+        <div className="mx-auto max-w-3xl">
+          <Eyebrow tono="oscuro" centrado>
+            GiaPlus
+          </Eyebrow>
+          <Reveal>
+            <h2 className="font-display mt-5 text-center text-[2rem] leading-tight text-balance sm:text-[2.6rem]">
+              Lo que comprás, te vuelve.
+            </h2>
+          </Reveal>
+          <p className="mx-auto mt-6 max-w-[52ch] text-center text-[1.05rem] leading-relaxed text-paper/80">
+            GiaPlus es el sistema de puntos de Giapura. Cada compra te suma puntos, y cada punto es
+            saldo para la próxima:{" "}
+            <strong className="font-medium text-gold-bright">1 punto = $10</strong>. Con 100 puntos
+            tenés $1.000 para usar.
+          </p>
+
+          <div className="mt-14">
+            <h3 className="font-display text-center text-[1.6rem] leading-tight sm:text-2xl">
+              Hay 4 niveles
+            </h3>
+            <p className="mx-auto mt-3 max-w-[46ch] text-center text-sm leading-relaxed text-paper/70">
+              Empezás como Maní Cero. Cuanto más alto llegás, más te deja cada compra. Esto es lo
+              que sumás por cada $10.000 que gastás:
+            </p>
+            <ul className="mt-8 space-y-3">
+              {GIAPLUS_NIVELES.map((nivel, i) => (
+                <li
+                  key={nivel.nombre}
+                  className="flex items-center gap-4 rounded-2xl border border-paper/12 bg-dark/30 px-5 py-4 sm:px-6"
+                >
+                  <span className="flex shrink-0 gap-1" aria-hidden="true">
+                    {Array.from({ length: i + 1 }).map((_, p) => (
+                      <span key={p} className="h-1.5 w-1.5 rounded-full bg-gold-bright" />
+                    ))}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="font-display block text-xl leading-tight">{nivel.nombre}</span>
+                    <span className="mt-0.5 block text-sm leading-snug text-paper/70">
+                      {nivel.descripcion}
+                    </span>
+                  </span>
+                  <span className="font-display ml-auto shrink-0 text-2xl text-gold-bright">
+                    +{nivel.puntos}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-16">
+            <h3 className="font-display text-center text-[1.6rem] leading-tight sm:text-2xl">
+              Cómo sumar más rápido
+            </h3>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {GIAPLUS_FORMAS.map((forma) => (
+                <div
+                  key={forma.grupo}
+                  className="rounded-2xl border border-paper/12 bg-dark/30 p-6"
+                >
+                  <p className="text-[0.7rem] font-medium uppercase tracking-[0.22em] text-gold-bright">
+                    {forma.grupo}
+                  </p>
+                  <ul className="mt-4 space-y-3">
+                    {forma.items.map((item) => (
+                      <li key={item.texto} className="flex items-baseline justify-between gap-4">
+                        <span className="text-sm leading-snug text-paper/85">{item.texto}</span>
+                        <span className="font-display shrink-0 text-lg text-gold-bright">
+                          +{item.puntos}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-16 rounded-[1.75rem] border border-gold-bright/35 bg-dark p-8 text-center sm:p-10">
+            <h3 className="font-display text-[1.7rem] leading-tight text-gold-bright sm:text-3xl">
+              Vos ya sos Fundador.
+            </h3>
+            <p className="mx-auto mt-4 max-w-[48ch] leading-relaxed text-paper/85">
+              Registrate en GiaPlus desde la tienda con el mail y el teléfono con los que compraste
+              la primera vez. Tu cuenta queda en nivel Fundador, el más alto, desde el día uno.
+            </p>
+            <div className="mt-7 flex justify-center">
+              <BotonCrema href={TIENDA_URL} offsetClass="focus-visible:ring-offset-dark">
+                Registrarme en GiaPlus
+              </BotonCrema>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Capítulo 4 — Reservado (sigue el mismo marrón) */}
       {hayReservado && (
-        <section className="relative px-6 pb-14 pt-24 text-paper sm:pb-20 sm:pt-28">
+        <section className="relative px-6 pb-14 pt-14 text-paper sm:pb-20 sm:pt-20">
           <Fondo color="var(--btn)" />
-          <Union desde="var(--bg)" hacia="var(--btn)" alto="12rem" />
           <div className="mx-auto max-w-3xl">
             {bloques.length > 0 && (
               <div>
@@ -805,12 +947,10 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
         </section>
       )}
 
-      {/* Capítulo 4 — Cierre (el más oscuro) */}
-      <section
-        className={`relative px-6 text-paper ${hayReservado ? "pt-14 sm:pt-20" : "pt-24 sm:pt-28"}`}
-      >
+      {/* Capítulo 5 — Cierre (el más oscuro) */}
+      <section className="relative px-6 pt-14 text-paper sm:pt-20">
         <Fondo color="var(--dark)" />
-        <Union desde={antesCierre} hacia="var(--dark)" alto={hayReservado ? "6rem" : "12rem"} />
+        <Union desde="var(--btn)" hacia="var(--dark)" alto="6rem" />
         <div className="mx-auto max-w-xl text-center">
           <Eyebrow tono="oscuro" centrado>
             Solo Fundadores
@@ -824,6 +964,28 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
             <NovedadesForm erpUrl={erpUrl} texto={config.novedadesTexto} botonTexto="Avisame cuando haya algo nuevo" />
           </div>
         </div>
+
+        {config.feedbackUrl && (
+          <div className="mx-auto mt-24 max-w-xl sm:mt-32">
+            <div className="rounded-[1.75rem] border border-paper/12 bg-paper/[0.04] p-8 text-center sm:p-10">
+              <Eyebrow tono="oscuro" centrado>
+                Tu opinión
+              </Eyebrow>
+              <h2 className="font-display mt-5 text-[1.8rem] leading-tight sm:text-[2.2rem]">
+                Contame qué te pareció.
+              </h2>
+              <p className="mt-3 leading-relaxed text-paper/80">
+                {config.feedbackTexto ??
+                  "Sos de los primeros en entrar acá. Tomate unos minutos: lo que me digas cambia lo que viene."}
+              </p>
+              <div className="mt-7 flex justify-center">
+                <BotonCrema href={config.feedbackUrl} offsetClass="focus-visible:ring-offset-dark">
+                  Dejar mi opinión
+                </BotonCrema>
+              </div>
+            </div>
+          </div>
+        )}
 
         <footer className="mx-auto mt-24 max-w-2xl border-t border-paper/10 py-16 text-center sm:mt-32">
           <p className="font-display mx-auto max-w-[26ch] text-2xl leading-snug text-paper">{config.footerTexto}</p>
