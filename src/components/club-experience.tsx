@@ -774,22 +774,7 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
         <Fondo color="var(--bg)" />
         <Union desde="var(--gold-bright)" hacia="var(--bg)" alto="6rem" />
         <div className="mx-auto max-w-3xl">
-          <div>
-            <Eyebrow tono="claro">Tu lugar en Giapura</Eyebrow>
-            <Reveal>
-              <h2 className="font-display mt-5 text-[2.2rem] leading-[1.08] text-balance text-cream sm:text-[2.9rem]">
-                {config.introTitulo}
-              </h2>
-            </Reveal>
-            {config.introTexto && (
-              <p className="mt-8 max-w-[52ch] whitespace-pre-line text-[1.08rem] leading-[1.8] text-cream-dim">
-                {renderRich(config.introTexto, "text-cream")}
-              </p>
-            )}
-          </div>
-          <div className="mt-14">
-            <TicketFundador />
-          </div>
+          <TicketFundador />
         </div>
       </section>
 
@@ -798,14 +783,18 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
         <Fondo color="var(--btn)" />
         <Union desde="var(--bg)" hacia="var(--btn)" alto="12rem" />
         <div className="mx-auto max-w-3xl">
-          <Eyebrow tono="oscuro" centrado>
-            GiaPlus
-          </Eyebrow>
           <Reveal>
-            <h2 className="font-display mt-5 text-center text-[2rem] leading-tight text-balance sm:text-[2.6rem]">
-              Lo que comprás, te vuelve.
+            <h2 className="mx-auto w-[min(17rem,72%)]">
+              <span className="sr-only">GiaPlus</span>
+              <span
+                aria-hidden="true"
+                className="logo-giaplus block aspect-[2000/692] w-full bg-gold-bright"
+              />
             </h2>
           </Reveal>
+          <p className="font-display mt-7 text-center text-[1.7rem] leading-tight text-balance sm:text-[2.1rem]">
+            Lo que comprás, te vuelve.
+          </p>
           <p className="mx-auto mt-6 max-w-[52ch] text-center text-[1.05rem] leading-relaxed text-paper/80">
             GiaPlus es el sistema de puntos de Giapura. Cada compra te suma puntos, y cada punto es
             saldo para la próxima:{" "}

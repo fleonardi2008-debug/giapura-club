@@ -1,10 +1,29 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap");
 @import "tailwindcss";
 
+/* Aileron, la tipografía de la marca, con sus pesos reales y servida desde el proyecto.
+   Antes había un solo archivo (Bold) cubriendo 400-700: todo el texto salía en negrita. */
 @font-face {
   font-family: "Aileron";
-  src: url("https://cdn.shopify.com/s/files/1/0995/7068/0129/files/Aileron-Bold.woff2") format("woff2");
-  font-weight: 400 700;
+  src: url("/fonts/Aileron-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aileron";
+  src: url("/fonts/Aileron-SemiBold.woff") format("woff");
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aileron";
+  src: url("/fonts/Aileron-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -76,6 +95,11 @@ body {
 .logo-mask {
   -webkit-mask: url("/logo.png") center / contain no-repeat;
   mask: url("/logo.png") center / contain no-repeat;
+}
+
+.logo-giaplus {
+  -webkit-mask: url("/giaplus.webp") center / contain no-repeat;
+  mask: url("/giaplus.webp") center / contain no-repeat;
 }
 
 .patron-mask {
