@@ -102,6 +102,73 @@ body {
   mask: url("/giaplus.webp") center / contain no-repeat;
 }
 
+/* Slider de GiaPlus: alto de 44px para que sea fácil de agarrar con el dedo. */
+.giaplus-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2.75rem;
+  background: transparent;
+  cursor: pointer;
+  --progreso: 0%;
+}
+.giaplus-range::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--gold-bright) var(--progreso),
+    rgba(245, 238, 223, 0.2) var(--progreso)
+  );
+}
+.giaplus-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: -0.625rem;
+  border-radius: 9999px;
+  background: var(--gold-bright);
+  border: 3px solid var(--dark);
+  box-shadow: 0 0 0 2px var(--gold-bright), 0 6px 18px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease;
+}
+.giaplus-range:active::-webkit-slider-thumb {
+  transform: scale(1.18);
+}
+.giaplus-range::-moz-range-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(245, 238, 223, 0.2);
+}
+.giaplus-range::-moz-range-progress {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--gold-bright);
+}
+.giaplus-range::-moz-range-thumb {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background: var(--gold-bright);
+  border: 3px solid var(--dark);
+  box-shadow: 0 0 0 2px var(--gold-bright), 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+.giaplus-range:focus-visible {
+  outline: none;
+}
+.giaplus-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--gold-bright), 0 0 0 7px rgba(245, 207, 137, 0.45);
+}
+.giaplus-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 2px var(--gold-bright), 0 0 0 7px rgba(245, 207, 137, 0.45);
+}
+@media (prefers-reduced-motion: reduce) {
+  .giaplus-range::-webkit-slider-thumb {
+    transition: none;
+  }
+}
+
 .patron-mask {
   -webkit-mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
   mask: url("/patron-mani-marron.webp") 0 0 / 380px repeat;
@@ -165,6 +232,11 @@ body {
 }
 
 html { scroll-behavior: smooth; }
+
+/* En celular el saldo de GiaPlus queda fijo abajo: que lo enfocado por teclado no quede tapado. */
+@media (max-width: 1023px) {
+  html { scroll-padding-bottom: 8rem; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
