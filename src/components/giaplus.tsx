@@ -526,7 +526,7 @@ function Compra({
         <strong className="font-medium text-gold-bright">
           {bloques} × {puntosPorBloque} = {miles(bloques * puntosPorBloque)} puntos
         </strong>
-        .
+        , o sea {pesos(bloques * puntosPorBloque * VALOR_PUNTO)} de saldo para tu próxima compra.
       </p>
     </div>
   );
@@ -622,10 +622,14 @@ function Tarjeta({
 
 function Extras({
   seleccion,
+  extras,
   onToggle,
+  onReset,
 }: {
   seleccion: string[];
+  extras: number;
   onToggle: (id: string) => void;
+  onReset: () => void;
 }) {
   const reduce = useReducedMotion();
   const [categoria, setCategoria] = useState(0);
@@ -676,104 +680,29 @@ function Extras({
           <Tarjeta key={a.id} accion={a} activa={seleccion.includes(a.id)} onToggle={() => onToggle(a.id)} />
         ))}
       </motion.div>
-      <p className="mt-4 text-sm text-paper/65">Tocá las que hacés y mirá cómo crece tu saldo.</p>
-    </div>
-  );
-}
-
-function Resultado({
-  nivel,
-  bloques,
-  extras,
-  cantidadExtras,
-  onReset,
-}: {
-  nivel: number;
-  bloques: number;
-  extras: number;
-  cantidadExtras: number;
-  onReset: () => void;
-}) {
-  const n = NIVELES[nivel];
-  const compra = bloques * n.puntos;
-  const total = compra + extras;
-  const saldo = total * VALOR_PUNTO;
-  const pct = (n.puntos * VALOR_PUNTO) / (BLOQUE_COMPRA / 100);
-
-  return (
-    <aside
-      aria-label="Simulación de saldo GiaPlus"
-      className="max-lg:sticky max-lg:bottom-3 max-lg:z-20 max-lg:mt-10 lg:sticky lg:top-6"
-    >
-      <div className="rounded-3xl border border-gold-bright/45 bg-dark/95 p-4 shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)] backdrop-blur lg:p-7">
-        <p className="sr-only" aria-live="polite">
-          Si comprás {pesos(bloques * BLOQUE_COMPRA)} como {n.nombre}, sumás {miles(compra)} puntos. Con lo que
-          marcaste son {miles(total)} puntos: {pesos(saldo)} de saldo para tu próxima compra.
-        </p>
-
-        <div className="flex items-center justify-between gap-4 lg:block">
-          <div>
-            <p className="text-[0.65rem] font-medium uppercase tracking-[0.24em] text-gold-bright">
-              Así te vuelve
-            </p>
-            <p className="font-display mt-1 text-[2.4rem] leading-none text-gold-bright lg:mt-3 lg:text-[3.6rem]">
-              <Numero valor={saldo} formato={pesos} />
-            </p>
-            <p className="mt-2 hidden text-sm text-paper/75 lg:block">de saldo para tu próxima compra</p>
-          </div>
-          <p className="text-right text-sm leading-snug text-paper/85 lg:mt-3 lg:text-left">
-            <strong className="font-medium text-paper">
-              <Numero valor={total} formato={miles} /> puntos
-            </strong>
-            <span className="block text-paper/70">
-              <span className="lg:hidden">saldo para tu próxima compra</span>
-              <span className="hidden lg:inline">te vuelve el {porcentaje(pct)}%</span>
-            </span>
-          </p>
-        </div>
-
-        <div className="hidden lg:block">
-          <div className="mt-6 h-2 overflow-hidden rounded-full bg-gold-bright/30" aria-hidden="true">
-            <motion.div
-              className="h-full origin-left rounded-full bg-gold-bright"
-              initial={false}
-              animate={{ scaleX: compra / total }}
-              transition={{ duration: 0.5, ease: EASE }}
-            />
-          </div>
-          <dl className="mt-4 space-y-2 text-sm">
-            <div className="flex items-center justify-between gap-3">
-              <dt className="flex items-center gap-2 text-paper/80">
-                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-gold-bright" />
-                Por comprar {pesos(bloques * BLOQUE_COMPRA)}
-              </dt>
-              <dd className="font-medium text-gold-bright">{miles(compra)} pts</dd>
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <dt className="flex items-center gap-2 text-paper/80">
-                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-gold-bright/30" />
-                Por lo que marcaste
-              </dt>
-              <dd className="font-medium text-gold-bright">+{miles(extras)} pts</dd>
-            </div>
-          </dl>
-          <p className="mt-5 rounded-xl bg-gold-bright/10 px-4 py-3 text-sm leading-relaxed text-paper/90">
-            Es una simulación: tu saldo real se suma con cada compra. Como{" "}
-            <strong className="font-medium text-gold-bright">{n.nombre}</strong>, lo canjeás en tus próximas
-            compras de Giapura.
-          </p>
-          {cantidadExtras > 0 && (
-            <button
-              type="button"
-              onClick={onReset}
-              className="mt-3 inline-flex h-11 cursor-pointer items-center text-sm text-paper/70 underline underline-offset-4 outline-none hover:text-paper focus-visible:ring-2 focus-visible:ring-gold-bright"
-            >
-              Empezar de nuevo
-            </button>
+      <div className="mt-4 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm">
+        <p aria-live="polite" className="text-paper/75">
+          {seleccion.length > 0 ? (
+            <>
+              Lo que marcaste suma{" "}
+              <strong className="font-medium text-gold-bright">+{miles(extras)} puntos</strong>, o sea{" "}
+              {pesos(extras * VALOR_PUNTO)} de saldo.
+            </>
+          ) : (
+            "Tocá las que hacés y mirá cuántos puntos sumás."
           )}
-        </div>
+        </p>
+        {seleccion.length > 0 && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex h-11 cursor-pointer items-center text-paper/70 underline underline-offset-4 outline-none hover:text-paper focus-visible:ring-2 focus-visible:ring-gold-bright"
+          >
+            Empezar de nuevo
+          </button>
+        )}
       </div>
-    </aside>
+    </div>
   );
 }
 
@@ -857,28 +786,19 @@ export function GiaPlusSection({ cta }: { cta: ReactNode }) {
           </p>
         </Aparece>
 
-        <div className="mt-14 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start lg:gap-10">
-          <div className="space-y-14">
-            <section aria-label="Tu nivel">
-              <TituloPaso numero="1" titulo="Elegí tu nivel" />
-              <Niveles nivel={nivel} onChange={setNivel} />
-            </section>
-            <section aria-label="Cuánto comprás">
-              <TituloPaso numero="2" titulo="Cuánto comprás" />
-              <Compra bloques={bloques} onChange={setBloques} puntosPorBloque={NIVELES[nivel].puntos} />
-            </section>
-            <section aria-label="Sumá más rápido">
-              <TituloPaso numero="3" titulo="Sumá más rápido" />
-              <Extras seleccion={seleccion} onToggle={alternar} />
-            </section>
-          </div>
-          <Resultado
-            nivel={nivel}
-            bloques={bloques}
-            extras={extras}
-            cantidadExtras={seleccion.length}
-            onReset={() => setSeleccion([])}
-          />
+        <div className="mx-auto mt-14 max-w-3xl space-y-14">
+          <section aria-label="Tu nivel">
+            <TituloPaso numero="1" titulo="Elegí tu nivel" />
+            <Niveles nivel={nivel} onChange={setNivel} />
+          </section>
+          <section aria-label="Cuánto comprás">
+            <TituloPaso numero="2" titulo="Cuánto comprás" />
+            <Compra bloques={bloques} onChange={setBloques} puntosPorBloque={NIVELES[nivel].puntos} />
+          </section>
+          <section aria-label="Sumá más rápido">
+            <TituloPaso numero="3" titulo="Sumá más rápido" />
+            <Extras seleccion={seleccion} extras={extras} onToggle={alternar} onReset={() => setSeleccion([])} />
+          </section>
         </div>
       </div>
 

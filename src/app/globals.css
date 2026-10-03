@@ -233,11 +233,6 @@ body {
 
 html { scroll-behavior: smooth; }
 
-/* En celular el saldo de GiaPlus queda fijo abajo: que lo enfocado por teclado no quede tapado. */
-@media (max-width: 1023px) {
-  html { scroll-padding-bottom: 8rem; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .btn-shine > .shine { display: none; }
