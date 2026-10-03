@@ -702,29 +702,33 @@ function Resultado({
 
   return (
     <aside
-      aria-label="Tu saldo GiaPlus"
+      aria-label="Simulación de saldo GiaPlus"
       className="max-lg:sticky max-lg:bottom-3 max-lg:z-20 max-lg:mt-10 lg:sticky lg:top-6"
     >
       <div className="rounded-3xl border border-gold-bright/45 bg-dark/95 p-4 shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)] backdrop-blur lg:p-7">
         <p className="sr-only" aria-live="polite">
-          Con {pesos(bloques * BLOQUE_COMPRA)} de compra como {n.nombre} sumás {miles(compra)} puntos. En total
-          tenés {miles(total)} puntos, que son {pesos(saldo)} de saldo.
+          Si comprás {pesos(bloques * BLOQUE_COMPRA)} como {n.nombre}, sumás {miles(compra)} puntos. Con lo que
+          marcaste son {miles(total)} puntos: {pesos(saldo)} de saldo para tu próxima compra.
         </p>
 
         <div className="flex items-center justify-between gap-4 lg:block">
           <div>
             <p className="text-[0.65rem] font-medium uppercase tracking-[0.24em] text-gold-bright">
-              Tu saldo GiaPlus
+              Así te vuelve
             </p>
             <p className="font-display mt-1 text-[2.4rem] leading-none text-gold-bright lg:mt-3 lg:text-[3.6rem]">
               <Numero valor={saldo} formato={pesos} />
             </p>
+            <p className="mt-2 hidden text-sm text-paper/75 lg:block">de saldo para tu próxima compra</p>
           </div>
           <p className="text-right text-sm leading-snug text-paper/85 lg:mt-3 lg:text-left">
             <strong className="font-medium text-paper">
               <Numero valor={total} formato={miles} /> puntos
             </strong>
-            <span className="block text-paper/70">te vuelve el {porcentaje(pct)}%</span>
+            <span className="block text-paper/70">
+              <span className="lg:hidden">saldo para tu próxima compra</span>
+              <span className="hidden lg:inline">te vuelve el {porcentaje(pct)}%</span>
+            </span>
           </p>
         </div>
 
@@ -741,21 +745,22 @@ function Resultado({
             <div className="flex items-center justify-between gap-3">
               <dt className="flex items-center gap-2 text-paper/80">
                 <span aria-hidden="true" className="h-2 w-2 rounded-full bg-gold-bright" />
-                Por tus compras
+                Por comprar {pesos(bloques * BLOQUE_COMPRA)}
               </dt>
               <dd className="font-medium text-gold-bright">{miles(compra)} pts</dd>
             </div>
             <div className="flex items-center justify-between gap-3">
               <dt className="flex items-center gap-2 text-paper/80">
                 <span aria-hidden="true" className="h-2 w-2 rounded-full bg-gold-bright/30" />
-                Por lo que hacés
+                Por lo que marcaste
               </dt>
               <dd className="font-medium text-gold-bright">+{miles(extras)} pts</dd>
             </div>
           </dl>
           <p className="mt-5 rounded-xl bg-gold-bright/10 px-4 py-3 text-sm leading-relaxed text-paper/90">
-            Como <strong className="font-medium text-gold-bright">{n.nombre}</strong>, ese saldo lo canjeás en
-            tus próximas compras de Giapura.
+            Es una simulación: tu saldo real se suma con cada compra. Como{" "}
+            <strong className="font-medium text-gold-bright">{n.nombre}</strong>, lo canjeás en tus próximas
+            compras de Giapura.
           </p>
           {cantidadExtras > 0 && (
             <button
