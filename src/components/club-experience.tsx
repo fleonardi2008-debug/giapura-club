@@ -110,6 +110,25 @@ function IconPlay({ className = "" }: { className?: string }) {
   );
 }
 
+function IconGift({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="4" y="10" width="16" height="10" rx="1.5" />
+      <path d="M3 7.5h18V10H3zM12 7.5V20" />
+      <path d="M12 7.5C10.5 4.5 7 4.5 7 6.7c0 1 1 .8 5 .8Zm0 0c1.5-3 5-3 5-.8 0 1-1 .8-5 .8Z" />
+    </svg>
+  );
+}
+
 function IconClose({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
@@ -725,6 +744,33 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
             </div>
             <p className="mt-4 text-sm text-gold">Canjealo en tu próxima compra online.</p>
           </div>
+
+          {config.feedbackUrl && (
+            <Reveal>
+              <div className="mx-auto mt-12 max-w-md rounded-3xl border border-dashed border-gold/45 px-6 py-8 text-center">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-btn text-gold-bright">
+                  <IconGift className="h-6 w-6" />
+                </span>
+                <p className="mt-4 text-[0.7rem] font-medium uppercase tracking-[0.28em] text-gold">Sorteo</p>
+                <h2 className="font-display mt-2 text-[1.7rem] leading-tight text-balance text-gold sm:text-[2rem]">
+                  Participá por dos frascos.
+                </h2>
+                <p className="mx-auto mt-3 max-w-[34ch] leading-relaxed text-gold">
+                  Completá el formulario, son 2 minutos, y entrás al sorteo de dos frascos de Giapura.
+                </p>
+                <a
+                  href={config.feedbackUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-shine group/sorteo mt-6 inline-flex cursor-pointer items-center gap-2 rounded-full bg-btn px-7 py-3.5 text-sm font-medium text-paper outline-none transition-colors duration-200 hover:bg-btn-hover focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-gold-bright"
+                >
+                  <span className="shine" />
+                  Completar el formulario
+                  <IconArrow className="h-4 w-4 transition-transform duration-200 group-hover/sorteo:translate-x-0.5" />
+                </a>
+              </div>
+            </Reveal>
+          )}
         </div>
       </section>
 
