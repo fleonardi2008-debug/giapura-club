@@ -449,26 +449,29 @@ function TicketFundador() {
 function BloqueCard({ bloque }: { bloque: Bloque }) {
   const embed = bloque.tipo === "VIDEO" ? toEmbedUrl(bloque.mediaUrl) : null;
   const destacado = bloque.tipo === "DESCUENTO" || bloque.tipo === "INVITACION";
-  const offset = destacado ? "focus-visible:ring-offset-dark" : "focus-visible:ring-offset-btn";
+  const offset = destacado ? "focus-visible:ring-offset-dark" : "focus-visible:ring-offset-bg-2";
+  const t = destacado
+    ? { punto: "bg-gold-bright", etiqueta: "text-gold-bright", titulo: "text-paper", cuerpo: "text-paper/80", aro: "focus-visible:ring-gold-bright", borde: "border-paper/15" }
+    : { punto: "bg-gold", etiqueta: "text-gold", titulo: "text-dark", cuerpo: "text-cream-dim", aro: "focus-visible:ring-gold", borde: "border-gold/20" };
 
   return (
     <article
       className={`overflow-hidden rounded-[1.75rem] border p-8 sm:p-10 ${
-        destacado ? "border-gold-bright/35 bg-dark" : "border-paper/12 bg-paper/[0.04]"
+        destacado ? "border-gold-bright/35 bg-dark" : "border-gold/25 bg-bg-2/80"
       }`}
     >
       <div className="flex items-center gap-2.5">
-        <span className="h-1.5 w-1.5 rounded-full bg-gold-bright" aria-hidden="true" />
-        <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-gold-bright">
+        <span className={`h-1.5 w-1.5 rounded-full ${t.punto}`} aria-hidden="true" />
+        <p className={`text-[0.7rem] font-medium uppercase tracking-[0.24em] ${t.etiqueta}`}>
           {TIPO_LABEL[bloque.tipo] ?? "Novedad"}
         </p>
       </div>
 
       {bloque.titulo && (
-        <h3 className="font-display mt-4 text-[1.7rem] leading-[1.12] text-paper sm:text-3xl">{bloque.titulo}</h3>
+        <h3 className={`font-display mt-4 text-[1.7rem] leading-[1.12] sm:text-3xl ${t.titulo}`}>{bloque.titulo}</h3>
       )}
       {bloque.cuerpo && (
-        <p className="mt-4 max-w-[54ch] whitespace-pre-line text-[1.05rem] leading-relaxed text-paper/80">
+        <p className={`mt-4 max-w-[54ch] whitespace-pre-line text-[1.05rem] leading-relaxed ${t.cuerpo}`}>
           {bloque.cuerpo}
         </p>
       )}
@@ -481,12 +484,12 @@ function BloqueCard({ bloque }: { bloque: Bloque }) {
 
       {bloque.codigo && (
         <div className="mt-7">
-          <CodigoChip codigo={bloque.codigo} focusClass={`focus-visible:ring-gold-bright ${offset}`} />
+          <CodigoChip codigo={bloque.codigo} focusClass={`${t.aro} ${offset}`} />
         </div>
       )}
 
       {bloque.tipo === "IMAGEN" && bloque.mediaUrl && (
-        <div className="mt-7 overflow-hidden rounded-2xl border border-paper/15">
+        <div className={`mt-7 overflow-hidden rounded-2xl border ${t.borde}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={bloque.mediaUrl} alt={bloque.titulo ?? "Novedad para Fundadores"} className="w-full" />
         </div>
@@ -494,9 +497,22 @@ function BloqueCard({ bloque }: { bloque: Bloque }) {
 
       {bloque.ctaTexto && bloque.ctaUrl && (
         <div className="mt-8">
-          <BotonCrema href={bloque.ctaUrl} offsetClass={offset}>
-            {bloque.ctaTexto}
-          </BotonCrema>
+          {destacado ? (
+            <BotonCrema href={bloque.ctaUrl} offsetClass={offset}>
+              {bloque.ctaTexto}
+            </BotonCrema>
+          ) : (
+            <a
+              href={bloque.ctaUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={`btn-shine group/cta inline-flex cursor-pointer items-center gap-2 rounded-full bg-btn px-7 py-3.5 text-sm font-medium text-paper outline-none transition-colors duration-200 hover:bg-btn-hover focus-visible:ring-2 focus-visible:ring-offset-2 ${t.aro} ${offset}`}
+            >
+              <span className="shine" />
+              {bloque.ctaTexto}
+              <IconArrow className="h-4 w-4 transition-transform duration-200 group-hover/cta:translate-x-0.5" />
+            </a>
+          )}
         </div>
       )}
     </article>
@@ -784,7 +800,9 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       </section>
 
       {/* Capítulo 3 — GiaPlus (marrón profundo) */}
-      <section className="relative px-6 pb-14 pt-24 text-paper sm:pb-20 sm:pt-28">
+      <section
+        className={`relative px-6 pt-24 text-paper sm:pt-28 ${hayReservado ? "pb-28" : "pb-14 sm:pb-20"}`}
+      >
         <Fondo color="var(--btn)" />
         <Union desde="var(--bg)" hacia="var(--btn)" alto="12rem" />
         <GiaPlusSection
@@ -796,18 +814,19 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
         />
       </section>
 
-      {/* Capítulo 4 — Reservado (sigue el mismo marrón) */}
+      {/* Capítulo 4 — Reservado y recorrido (dorado, distinto de GiaPlus) */}
       {hayReservado && (
-        <section className="relative px-6 pb-14 pt-14 text-paper sm:pb-20 sm:pt-20">
-          <Fondo color="var(--btn)" />
+        <section className="relative px-6 pb-28 pt-28 text-dark">
+          <Fondo color="var(--gold-bright)" />
+          <Union desde="var(--btn)" hacia="var(--gold-bright)" alto="12rem" />
           <div className="mx-auto max-w-3xl">
             {bloques.length > 0 && (
               <div>
-                <Eyebrow tono="oscuro" centrado>
+                <Eyebrow tono="claro" centrado>
                   Reservado para vos
                 </Eyebrow>
                 <Reveal>
-                  <h2 className="font-display mt-5 text-center text-[2rem] leading-tight text-balance sm:text-[2.6rem]">
+                  <h2 className="font-display mt-5 text-center text-[2rem] leading-tight text-balance text-gold sm:text-[2.6rem]">
                     Solo para quienes estuvieron desde el principio.
                   </h2>
                 </Reveal>
@@ -821,25 +840,27 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
 
             {historial.length > 0 && (
               <div className={bloques.length > 0 ? "mt-24" : ""}>
-                <Eyebrow tono="oscuro" centrado>
+                <Eyebrow tono="claro" centrado>
                   El recorrido
                 </Eyebrow>
                 <Reveal>
-                  <h2 className="font-display mt-5 text-center text-2xl sm:text-3xl">Todo lo que ya pasó por acá</h2>
+                  <h2 className="font-display mt-5 text-center text-2xl text-gold sm:text-3xl">
+                    Todo lo que ya pasó por acá
+                  </h2>
                 </Reveal>
-                <ul className="mx-auto mt-10 max-w-xl divide-y divide-paper/12 overflow-hidden rounded-2xl border border-paper/12">
+                <ul className="mx-auto mt-10 max-w-xl divide-y divide-gold/15 overflow-hidden rounded-2xl border border-gold/25">
                   {historial.map((item) => (
-                    <li key={item.id} className="flex items-center gap-4 bg-dark/30 px-6 py-4">
+                    <li key={item.id} className="flex items-center gap-4 bg-bg-2/70 px-6 py-4">
                       <span
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
-                          item.desbloqueado ? "bg-gold-bright text-dark" : "border border-paper/25 text-paper/70"
+                          item.desbloqueado ? "bg-gold text-paper" : "border border-gold/40 text-gold/80"
                         }`}
                       >
                         {item.desbloqueado ? <IconCheck className="h-3.5 w-3.5" /> : <IconLock className="h-3.5 w-3.5" />}
                       </span>
-                      <span className={item.desbloqueado ? "text-paper" : "text-paper/70"}>{item.titulo}</span>
+                      <span className={item.desbloqueado ? "text-dark" : "text-gold/80"}>{item.titulo}</span>
                       {!item.desbloqueado && (
-                        <span className="ml-auto text-[0.7rem] font-medium uppercase tracking-[0.18em] text-gold-bright">
+                        <span className="ml-auto text-[0.7rem] font-medium uppercase tracking-[0.18em] text-gold">
                           Pronto
                         </span>
                       )}
@@ -853,9 +874,13 @@ export function ClubExperience({ content, erpUrl }: { content: ClubContent; erpU
       )}
 
       {/* Capítulo 5 — Cierre (el más oscuro) */}
-      <section className="relative px-6 pt-14 text-paper sm:pt-20">
+      <section className={`relative px-6 text-paper ${hayReservado ? "pt-28" : "pt-14 sm:pt-20"}`}>
         <Fondo color="var(--dark)" />
-        <Union desde="var(--btn)" hacia="var(--dark)" alto="6rem" />
+        <Union
+          desde={hayReservado ? "var(--gold-bright)" : "var(--btn)"}
+          hacia="var(--dark)"
+          alto={hayReservado ? "12rem" : "6rem"}
+        />
         <div className="mx-auto max-w-xl text-center">
           <Eyebrow tono="oscuro" centrado>
             Solo Fundadores
